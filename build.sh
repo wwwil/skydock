@@ -17,8 +17,8 @@ sleep 1
 
 # Make mount point and mount image
 mkdir -p /mnt/raspbian
-mount -o rw /dev/${LOOP_DEV}p2 /mnt/raspbian
-mount -o rw /dev/${LOOP_DEV}p1 /mnt/raspbian/boot
+mount -o rw ${LOOP_DEV}p2 /mnt/raspbian
+mount -o rw ${LOOP_DEV}p1 /mnt/raspbian/boot
 
 # Create bind mounts for system directories
 mount --bind /dev /mnt/raspbian/dev/
