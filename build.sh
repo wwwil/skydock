@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Install dependencies
-apt-get update && apt-get install -y wget unzip qemu qemu-user-static binfmt-support
-
 IMG_LINK=http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2018-10-11/2018-10-09-raspbian-stretch-lite.zip
 IMG_ZIP=$(basename $IMG_LINK)
 
