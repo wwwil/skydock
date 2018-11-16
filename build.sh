@@ -1,5 +1,8 @@
 #!/bin/bash
 
+losetup -V
+exit 1
+
 # Install dependencies
 apt-get update && apt-get install -y wget unzip qemu qemu-user-static binfmt-support
 
