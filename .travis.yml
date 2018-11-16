@@ -2,4 +2,7 @@ language: minimal
 jobs:
   include:
     - stage: build
-      script: sudo ./build.sh
+      script: docker build -t rasp-mod .
+      script: docker run --rm --privileged rasp-mod \
+                bash -e -o pipefail -c \
+                "chmod +x build.sh && ./build.sh"
