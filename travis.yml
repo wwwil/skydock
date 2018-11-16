@@ -1,0 +1,5 @@
+language: minimal
+jobs:
+  include:
+    - stage: build
+      script: ./build.sh
