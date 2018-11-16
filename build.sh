@@ -1,8 +1,5 @@
 #!/bin/bash
 
-losetup -V
-exit 1
-
 # Install dependencies
 apt-get update && apt-get install -y wget unzip qemu qemu-user-static binfmt-support
 
@@ -16,7 +13,7 @@ fi
 unzip -o *.zip
 
 # Create loop device map from image partition table
-LOOP_DEV=$(losetup --show --find *.img)
+LOOP_DEV=$(losetup --show --find --partscan *.img)
 
 # Wait a second or mount may fail
 sleep 1
