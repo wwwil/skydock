@@ -15,6 +15,21 @@ LOOP_DEV=$(losetup --show --find --partscan *.img)
 # Wait a second or mount may fail
 sleep 1
 
+# Get list of partitions, drop the first line, as this is our
+# LOOP_DEV itself, we only what the child partitions
+PARTITIONS=$(lsblk --raw --output "MAJ:MIN" --noheadings ${LOOPDEV} | tail -n +2)
+
+# Manually use mknod to create nodes for partitons on loop device
+# Testing indicates this is required when running in a container,
+# even if the containter is run --pivileged
+COUNTER=1
+for i in $PARTITIONS; do
+    MAJ=$(echo $i | cut -d: -f1)
+    MIN=$(echo $i | cut -d: -f2)
+    if [ ! -e "${LOOP_DEV}p${COUNTER}" ]; then mknod ${LOOP_DEV}p${COUNTER} b $MAJ $MIN; fi
+    COUNTER=$((COUNTER + 1))
+done
+
 # Make mount point and mount image
 mkdir -p /mnt/raspbian
 mount -o rw ${LOOP_DEV}p2 /mnt/raspbian
