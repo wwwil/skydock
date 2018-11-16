@@ -5,7 +5,7 @@ IMG_ZIP=$(basename $IMG_LINK)
 
 # Download zip and extract the img
 if [ ! -f "$IMG_ZIP" ]; then
-	wget $IMG_LINK
+	wget -nv $IMG_LINK
 fi
 unzip -o *.zip
 
