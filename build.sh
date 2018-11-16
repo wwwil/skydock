@@ -13,7 +13,7 @@ fi
 unzip -o *.zip
 
 # Create loop device map from image partition table
-LOOP_DEV=$(losetup --show --find --partscan *.img)
+LOOP_DEV=$(losetup --show --find *.img)
 
 # Wait a second or mount may fail
 sleep 1
