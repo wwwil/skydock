@@ -47,6 +47,9 @@ sed -i 's/^/#CHROOT /g' /mnt/raspbian/etc/ld.so.preload
 # Copy qemu binary
 cp /usr/bin/qemu-arm-static /mnt/raspbian/usr/bin/
 
+# Enable qemu-arm
+update-binfmts --enable qemu-arm
+
 # Chroot to raspbian
 chroot /mnt/raspbian ls /boot
 
