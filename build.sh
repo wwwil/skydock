@@ -17,7 +17,7 @@ sleep 1
 
 # Get list of partitions, drop the first line, as this is our
 # LOOP_DEV itself, we only what the child partitions
-PARTITIONS=$(lsblk --raw --output "MAJ:MIN" --noheadings ${LOOPDEV} | tail -n +2)
+PARTITIONS=$(lsblk --raw --output "MAJ:MIN" --noheadings ${LOOP_DEV} | tail -n +2)
 
 # Manually use mknod to create nodes for partitons on loop device
 # Testing indicates this is required when running in a container,
