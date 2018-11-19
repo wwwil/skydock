@@ -27,7 +27,7 @@ script:
       echo "FAILURE - Testing Docker container failed";
       exit 1;
     fi
-    echo "SUCCESS - Testing was successful"
+  - echo "SUCCESS - Testing was successful"
   # If this is the master branch an the test passes, add the 'stable' tag and push to the registry
   - if [ $TRAVIS_BRANCH == "master" ]; then
       echo "DEPLOY - Will now push Docker image to Docker Hub";
