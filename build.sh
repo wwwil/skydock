@@ -1,16 +1,7 @@
 #!/bin/bash
 
-IMG_LINK=http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2018-10-11/2018-10-09-raspbian-stretch-lite.zip
-IMG_ZIP=$(basename $IMG_LINK)
-
-# Download zip and extract the img
-if [ ! -f "$IMG_ZIP" ]; then
-	wget -nv $IMG_LINK
-fi
-unzip -o *.zip
-
 # Create loop device map from image partition table
-LOOP_DEV=$(losetup --show --find --partscan *.img)
+LOOP_DEV=$(losetup --show --find --partscan $SOURCE_IMG)
 
 # Wait a second or mount may fail
 sleep 1
@@ -51,7 +42,7 @@ cp /usr/bin/qemu-arm-static /mnt/raspbian/usr/bin/
 update-binfmts --enable qemu-arm
 
 # Chroot to raspbian
-chroot /mnt/raspbian ls /boot
+chroot /mnt/raspbian $SCRIPT
 
 # Revert ld.so.preload fix
 sed -i 's/^#CHROOT //g' /mnt/raspbian/etc/ld.so.preload
