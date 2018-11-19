@@ -6,6 +6,11 @@ echo "SCRIPT: $SCRIPT"
 # Create loop device map from image partition table
 LOOP_DEV=$(losetup --show --find --partscan $SOURCE_IMAGE)
 
+# If this fails, exit here
+if [ $? -ne 0 ]; then
+	exit 1
+fi
+
 # Wait a second or mount may fail
 sleep 1
 
