@@ -7,3 +7,5 @@ RUN apt-get -y update && \
 WORKDIR /build/
 
 COPY build.sh /build/
+
+ENTRYPOINT /build/build.sh
