@@ -9,9 +9,11 @@ script:
   - docker build -t edwardotme/raspbian-customiser:$TRAVIS_BRANCH .
   # Run the Docker image to test
   - IMG_LINK=http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2018-10-11/2018-10-09-raspbian-stretch-lite.zip
-  - wget -nv $IMG_LINK test/
-  - unzip -o test/$(basename $IMG_LINK) test/
-  - rm test/$(basename $IMG_LINK)
+  - cd test/
+  - wget -nv $IMG_LINK
+  - unzip -o $(basename $IMG_LINK)
+  - rm $(basename $IMG_LINK)
+  - cd ..
   - docker run --privileged --rm
     -e SOURCE_IMAGE=/test/*.img
     -e SCRIPT=/test/test.sh
