@@ -22,14 +22,8 @@ script:
     -e SCRIPT=/test/test.sh
     --mount type=bind,source="$(pwd)"/test,destination=/test
     edwardotme/raspbian-customiser:$TRAVIS_BRANCH
-  # Stop here if this fails
-  - if [ $? -ne 0 ]; then
-      echo "FAILURE - Testing Docker container failed";
-      exit 1;
-    fi
-  - echo "SUCCESS - Testing was successful"
-  # If this is the master branch an the test passes, add the 'stable' tag and push to the registry
-  - if [ $TRAVIS_BRANCH == "master" ]; then
+  # If this is the master branch and the test passes, add the 'stable' tag and push to the registry
+  - if [ $TRAVIS_BRANCH == "master" && $? == 0 ]; then
       echo "DEPLOY - Will now push Docker image to Docker Hub";
       echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin;
       docker tag edwardotme/raspbian-customiser:$TRAVIS_BRANCH edwardotme/raspbian-customiser:stable;
