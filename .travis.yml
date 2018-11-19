@@ -8,14 +8,15 @@ services:
 script:
   - docker build -t edwardotme/raspbian-customiser:$TRAVIS_BRANCH .
   # Run the Docker image to test
-  - IMG_LINK=http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2018-10-11/2018-10-09-raspbian-stretch-lite.zip
+  - IMAGE_LINK=http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2018-10-11/2018-10-09-raspbian-stretch-lite.zip
   - cd test/
-  - wget -nv $IMG_LINK
-  - unzip -o $(basename $IMG_LINK)
-  - rm $(basename $IMG_LINK)
+  - wget -nv $IMAGE_LINK
+  - IMAGE_ZIP=$(basename $IMAGE_LINK)
+  - unzip -o $IMAGE_ZIP
+  - rm $IMAGE_ZIP
   - cd ..
   - docker run --privileged --rm
-    -e SOURCE_IMAGE=/test/*.img
+    -e SOURCE_IMAGE=/test/${IMAGE_ZIP%.zip}.img
     -e SCRIPT=/test/test.sh
     --mount source=test,destination=/test
     edwardotme/raspbian-customiser:$TRAVIS_BRANCH
