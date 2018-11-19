@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "SOURCE_IMG: $SOURCE_IMG"
+echo "SCRIPT: $SCRIPT"
+
 # Create loop device map from image partition table
 LOOP_DEV=$(losetup --show --find --partscan $SOURCE_IMG)
 
