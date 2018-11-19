@@ -1,5 +1,26 @@
 language: minimal
-jobs:
-  include:
-    - stage: build
-      script: ./build-docker.sh
+
+sudo: required
+
+services:
+  - docker
+
+script:
+  - docker build -t edwardotme/raspbian-customiser:$TRAVIS_BRANCH .
+  # Run the Docker image to test
+  - IMG_LINK=http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2018-10-11/2018-10-09-raspbian-stretch-lite.zip
+  - wget -nv $IMG_LINK test/
+  - unzip -o test/$(basename $IMG_LINK) test/
+  - rm test/$(basename $IMG_LINK)
+  - docker run --privileged
+    -e SOURCE_IMAGE=/test/*.img
+    -e SCRIPT=/test/test.sh
+    --mount source=test,destination=/test
+    edwardotme/raspbian-customiser:$TRAVIS_BRANCH
+  # If this is the master branch an the test passes, add the 'stable' tag and push to the registry
+  - |
+    if [ $TRAVIS_BRANCH == "master" ]; then
+      echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      docker tag edwardotme/raspbian-customiser:$TRAVIS_BRANCH edwardotme/raspbian-customiser:stable
+      docker push edwardotme/raspbian-customiser:stable
+    fi
