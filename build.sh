@@ -1,10 +1,10 @@
 #!/bin/bash
 
-echo "SOURCE_IMG: $SOURCE_IMG"
+echo "SOURCE_IMAGE: $SOURCE_IMAGE"
 echo "SCRIPT: $SCRIPT"
 
 # Create loop device map from image partition table
-LOOP_DEV=$(losetup --show --find --partscan $SOURCE_IMG)
+LOOP_DEV=$(losetup --show --find --partscan $SOURCE_IMAGE)
 
 # Wait a second or mount may fail
 sleep 1
