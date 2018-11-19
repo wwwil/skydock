@@ -20,7 +20,7 @@ script:
   # If this is the master branch an the test passes, add the 'stable' tag and push to the registry
   - |
     if [ $TRAVIS_BRANCH == "master" ]; then
-      echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
       docker tag edwardotme/raspbian-customiser:$TRAVIS_BRANCH edwardotme/raspbian-customiser:stable
       docker push edwardotme/raspbian-customiser:stable
     fi
