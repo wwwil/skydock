@@ -20,6 +20,11 @@ script:
     -e SCRIPT=/test/test.sh
     --mount source=test,destination=/test
     edwardotme/raspbian-customiser:$TRAVIS_BRANCH
+  # Stop here if this fails
+  - |
+    if [ $? -ne 0 ]; then
+      exit 1
+    fi
   # If this is the master branch an the test passes, add the 'stable' tag and push to the registry
   - |
     if [ $TRAVIS_BRANCH == "master" ]; then
