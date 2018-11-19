@@ -19,7 +19,7 @@ script:
   - docker run --privileged --rm
     -e SOURCE_IMAGE=/test/${IMAGE_ZIP%.zip}.img
     -e SCRIPT=/test/test.sh
-    --mount source=test,destination=/test
+    --mount source=test,target=/test
     edwardotme/raspbian-customiser:$TRAVIS_BRANCH
   # Stop here if this fails
   - |
