@@ -40,6 +40,9 @@ mount --bind /sys /mnt/raspbian/sys/
 mount --bind /proc /mnt/raspbian/proc/
 mount --bind /dev/pts /mnt/raspbian/dev/pts
 
+mkdir /mnt/raspbian/$MOUNT
+mount --bind $MOUNT /mnt/raspbian/$MOUNT
+
 # Apply ld.so.preload fix
 sed -i 's/^/#CHROOT /g' /mnt/raspbian/etc/ld.so.preload
 
