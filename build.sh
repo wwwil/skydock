@@ -59,4 +59,4 @@ chroot /mnt/raspbian $SCRIPT
 sed -i 's/^#CHROOT //g' /mnt/raspbian/etc/ld.so.preload
 
 # Unmount everything
-umount /mnt/raspbian/{dev/pts,dev,sys,proc,boot,}
+umount /mnt/raspbian/{dev/pts,dev,sys,proc,boot,${MOUNT},}
