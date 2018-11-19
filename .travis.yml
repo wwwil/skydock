@@ -6,8 +6,9 @@ services:
   - docker
 
 script:
+  - echo "BUILD - Will now build Docker container"
   - docker build -t edwardotme/raspbian-customiser:$TRAVIS_BRANCH .
-  # Run the Docker image to test
+  - echo "TEST - Will now test built Docker container"
   - IMAGE_LINK=http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2018-10-11/2018-10-09-raspbian-stretch-lite.zip
   - cd test/
   - wget -nv $IMAGE_LINK
@@ -23,11 +24,14 @@ script:
   # Stop here if this fails
   - |
     if [ $? -ne 0 ]; then
+      echo "FAILURE - Testing Docker container failed"
       exit 1
     fi
+    echo "SUCCESS - Testing was successful"
   # If this is the master branch an the test passes, add the 'stable' tag and push to the registry
   - |
     if [ $TRAVIS_BRANCH == "master" ]; then
+      echo "DEPLOY - Will now push Docker image to Docker Hub"
       echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
       docker tag edwardotme/raspbian-customiser:$TRAVIS_BRANCH edwardotme/raspbian-customiser:stable
       docker push edwardotme/raspbian-customiser:stable
