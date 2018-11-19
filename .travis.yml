@@ -12,7 +12,7 @@ script:
   - wget -nv $IMG_LINK test/
   - unzip -o test/$(basename $IMG_LINK) test/
   - rm test/$(basename $IMG_LINK)
-  - docker run --privileged
+  - docker run --privileged --rm
     -e SOURCE_IMAGE=/test/*.img
     -e SCRIPT=/test/test.sh
     --mount source=test,destination=/test
