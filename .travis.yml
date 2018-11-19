@@ -17,6 +17,7 @@ script:
   - rm $IMAGE_ZIP
   - cd ..
   - docker run --privileged --rm
+    -e MOUNT=/test
     -e SOURCE_IMAGE=/test/${IMAGE_ZIP%.zip}.img
     -e SCRIPT=/test/test.sh
     --mount type=bind,source="$(pwd)"/test,destination=/test
