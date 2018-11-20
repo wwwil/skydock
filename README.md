@@ -12,6 +12,8 @@ docker pull edwardotme/raspbian-customiser:latest
 
 To use it, group any scripts and asset files in a directory. Then mount this directory as a Docker volume when running the container.
 
+To mount the directory in the Raspbian environment specify it's path with the `MOUNT` environment variable.
+
 To specify a script to run in the Raspbian environment use the `SCRIPT` environment variable. This should point to your main script in the mounted volume which can apply whatever modifications you require and copy any asset files from the volume to their desired location.
 
 The source image file can also be specified with `SOURCE_IMAGE`. This should be the path to an `.img` file, also found in your mounted volume.
