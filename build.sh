@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo "MOUNT: $MOUNT"
 echo "SOURCE_IMAGE: $SOURCE_IMAGE"
 echo "SCRIPT: $SCRIPT"
 
