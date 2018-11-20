@@ -17,8 +17,8 @@ docker run --privileged --rm \
   -e MOUNT=/test \
   -e SOURCE_IMAGE=/test/${IMAGE_ZIP%.zip}.img \
   -e SCRIPT=/test/test.sh \
-  --mount type=bind,source="$(pwd)"/test,destination=/test
-edwardotme/raspbian-customiser:$TRAVIS_BRANCH
+  --mount type=bind,source="$(pwd)"/test,destination=/test \
+  edwardotme/raspbian-customiser:$TRAVIS_BRANCH
 if [ $? -ne 0 ]; then
   exit 1;
 fi
