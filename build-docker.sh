@@ -23,11 +23,15 @@ if [ $? -ne 0 ]; then
   exit 1;
 fi
 
-if [ $TRAVIS_BRANCH != "master" ]; then
-  exit 0;
+if [ $TRAVIS_BRANCH == "master" ]; then
+  # For tag builds TRAVIS_BRANCH is set to the tag name
+  echo "DEPLOY - Will now push Docker image to Docker Hub as latest"
+  echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+  docker tag edwardotme/raspbian-customiser:$TRAVIS_BRANCH edwardotme/raspbian-customiser:latest
+  docker push edwardotme/raspbian-customiser:latest
+elif [ ! -z $TRAVIS_TAG ]; then
+  echo "DEPLOY - Will now push Docker image to Docker Hub as $TRAVIS_TAG"
+  echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+  docker tag edwardotme/raspbian-customiser:$TRAVIS_BRANCH edwardotme/raspbian-customiser:$TRAVIS_TAG
+  docker push edwardotme/raspbian-customiser:$TRAVIS_TAG
 fi
-echo "DEPLOY - Will now push Docker image to Docker Hub"
-echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
-docker tag edwardotme/raspbian-customiser:$TRAVIS_BRANCH edwardotme/raspbian-customiser:stable
-docker push edwardotme/raspbian-customiser:stable
-
