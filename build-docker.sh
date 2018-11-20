@@ -23,7 +23,7 @@ if [ $? -ne 0 ]; then
   exit 1;
 fi
 
-if [ $TRAVIS_BRANCH -ne "master" ]; then
+if [ $TRAVIS_BRANCH != "master" ]; then
   exit 0;
 fi
 echo "DEPLOY - Will now push Docker image to Docker Hub"
