@@ -3,14 +3,14 @@
 # Some basic commands to run on the Raspbian system to confirm chroot is working
 # and generate some information output
 
+set -e
+
 uname -a
 
 ls /
 ls /boot
 ls /data
 
-for PART_NUMBER in 1 2 3; do
-	parted align-check opt $PART_NUMBER
-done
+lsblk
 
 apt-get update
