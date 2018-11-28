@@ -80,7 +80,7 @@ mount -o rw ${LOOP_DEV}p1 ${ROOTFS_DIR}/boot
 
 # Format the partiton
 # Assumes FAT32 partition format
-# TODO: ensure name is UPPER CASE
+PART_NAME=$(echo $PART_NAME | tr a-z A-Z )
 mkdosfs -n "${PART_NAME}" -F 32 -v "${LOOP_DEV}p3" > /dev/null
 
 # Use parted to print the partition table
