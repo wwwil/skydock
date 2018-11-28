@@ -62,6 +62,9 @@ parted -a none -s "${IMG_FILE}" mkpart primary "${PART_TYPE}" "${PART_START}B" 1
 # Use parted to print the partition table
 parted -s "${IMG_FILE}" unit b print free
 
+# Check the partiton is optimally aligned
+parted -s "${IMG_FILE}" align-check opt 3
+
 # Mount the image as a loop device
 LOOP_DEV=$(losetup --show --find --partscan $IMG_FILE)
 # Wait a second or mount may fail
