@@ -18,10 +18,14 @@ To specify a script to run in the Raspbian environment use the `SCRIPT` environm
 
 The source image file can also be specified with `SOURCE_IMAGE`. This should be the path to an `.img` file, also found in your mounted volume.
 
+A FAT32 format data partition can be added to the end of the image if `ADD_DATA_PART` is set to `true`. This partiton can be helpful when writing the image to an SD card in macOS and Windows as data files can be placed there. The partition will be `64MiB`, labeled `DATA`, and mounted at `/data`. The `/etc/fstab` and `/boot/config.txt` files will be updated with correct `PARTUUID`s.
+
 ```
 docker run --privileged \
+-e MOUNT=/customisations \
 -e SOURCE_IMAGE=/customisations/raspbian-lite.img \
 -e SCRIPT=/customisations/customise.sh \
+-e ADD_DATA_PART=true \
 --mount source=customisations,destination=/customisations \
 edwardotme/raspbian-customiser:latest
 ```
