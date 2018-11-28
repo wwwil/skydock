@@ -7,5 +7,6 @@ RUN apt-get -y update && \
 WORKDIR /build/
 
 COPY build.sh /build/
+COPY add-partition.sh /build/
 
 ENTRYPOINT /build/build.sh
