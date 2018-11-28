@@ -6,10 +6,16 @@ set -e
 
 IMG_FILE=$1
 
-PART_NAME=DATA
+# These could be set by args
+# Size should be in MiB
 PART_SIZE=64
-PART_TYPE=fat32
+# Name will be converted to uppercase
+PART_NAME=DATA
+# Mount is relative to root of image
 PART_MOUNT=/data
+
+# Currently only FAT32 is supported
+PART_TYPE=fat32
 
 # Use parted to print the partition table
 PARTED_OUT=$(parted -s "${IMG_FILE}" unit b print)
@@ -27,6 +33,7 @@ PART_START=$((($ROOT_END + 1) / $BLOCK))
 PART_START=$((($PART_START + 1) * $BLOCK))
 
 # Work out how much to expand the image to fit the new partition
+PART_EXPAND=
 # Convert PART_SIZE from MiB to B
 PART_EXPAND=$(($PART_SIZE * 1024 * 1024))
 # Add the free space gap required between the end of the previous
@@ -79,7 +86,6 @@ mount -o rw ${LOOP_DEV}p2 $ROOTFS_DIR
 mount -o rw ${LOOP_DEV}p1 ${ROOTFS_DIR}/boot
 
 # Format the partiton
-# Assumes FAT32 partition format
 PART_NAME=$(echo $PART_NAME | tr a-z A-Z )
 mkdosfs -n "${PART_NAME}" -F 32 -v "${LOOP_DEV}p3" > /dev/null
 
