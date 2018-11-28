@@ -10,7 +10,7 @@ echo "SCRIPT: $SCRIPT"
 echo "ADD_DATA_PART: $ADD_DATA_PART"
 
 if [ $ADD_DATA_PART != false ]; then
-	./add-partition.sh $SOURCE_IMAGE
+	source ./add-partition.sh $SOURCE_IMAGE
 fi
 
 # Create loop device map from image partition table
