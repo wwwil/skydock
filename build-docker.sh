@@ -17,6 +17,7 @@ docker run --privileged --rm \
   -e MOUNT=/test \
   -e SOURCE_IMAGE=/test/${IMAGE_ZIP%.zip}.img \
   -e SCRIPT=/test/test.sh \
+  -e ADD_DATA_PART=true \
   --mount type=bind,source="$(pwd)"/test,destination=/test \
   edwardotme/raspbian-customiser:$TRAVIS_BRANCH
 if [ $? -ne 0 ]; then
