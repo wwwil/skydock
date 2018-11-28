@@ -1,8 +1,17 @@
 #!/bin/bash
 
+set -e
+
+ADD_DATA_PART=${ADD_DATA_PART:-false}
+
 echo "MOUNT: $MOUNT"
 echo "SOURCE_IMAGE: $SOURCE_IMAGE"
 echo "SCRIPT: $SCRIPT"
+echo "ADD_DATA_PART: $ADD_DATA_PART"
+
+if [ $ADD_DATA_PART != false ]; then
+	source ./add-partition.sh $SOURCE_IMAGE
+fi
 
 # Create loop device map from image partition table
 LOOP_DEV=$(losetup --show --find --partscan $SOURCE_IMAGE)
@@ -35,6 +44,10 @@ mkdir -p /mnt/raspbian
 mount -o rw ${LOOP_DEV}p2 /mnt/raspbian
 mount -o rw ${LOOP_DEV}p1 /mnt/raspbian/boot
 
+if [ $ADD_DATA_PART != false ]; then
+	mount -o rw ${LOOP_DEV}p3 /mnt/raspbian/data
+fi
+
 # Create bind mounts for system directories
 mount --bind /dev /mnt/raspbian/dev/
 mount --bind /sys /mnt/raspbian/sys/
@@ -60,4 +73,8 @@ chroot /mnt/raspbian $SCRIPT
 sed -i 's/^#CHROOT //g' /mnt/raspbian/etc/ld.so.preload
 
 # Unmount everything
+if [ $ADD_DATA_PART != false ]; then
+	umount /mnt/raspbian/data
+fi
 umount /mnt/raspbian/{dev/pts,dev,sys,proc,boot,${MOUNT},}
+losetup -d $LOOP_DEV
