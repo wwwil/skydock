@@ -119,6 +119,9 @@ cat "${ROOTFS_DIR}/etc/fstab"
 
 # Update cmdline.txt to use the new PARTUUID
 sed -i "s/PARTUUID=[a-z0-9]*-02/PARTUUID=${ROOT_PARTUUID}/" "${ROOTFS_DIR}/boot/cmdline.txt"
+# Remove the reference to the expand rootfs script as it can no longer be
+# expanded with the new partition in the way
+sed -i "s/init=.*//" "${ROOTFS_DIR}/boot/cmdline.txt"
 echo "CMDLINE.TXT:"
 cat "${ROOTFS_DIR}/boot/cmdline.txt"
 
