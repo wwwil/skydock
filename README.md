@@ -1,6 +1,6 @@
 # raspbian-customiser
 
-[![Build Status](https://travis-ci.com/EDWARDOtme/raspbian-customiser.svg?branch=master)](https://travis-ci.com/EDWARDOtme/raspbian-customiser)
+[![Build Status](https://travis-ci.com/lumastar/raspbian-customiser.svg?branch=master)](https://travis-ci.com/lumastar/raspbian-customiser)
 
 Tool to customise a Raspbian image by mounting it as a loop device and running commands in it with *chroot* and *qemu*. This enables automated creation of the customised Rasbian images, and is designed to use in CI/CD pipelines to package software into a pre-configured image which can easily be deployed to a Raspberry Pi.
 
