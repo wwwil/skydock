@@ -1,8 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Add a FAT32 data partion to a Rasbian .img file
 
-set -e
+set -o errexit
+set -o nounset
+set -o pipefail
+set -o xtrace
 
 IMG_FILE=$1
 

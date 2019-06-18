@@ -1,6 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-set -e
+set -o errexit
+set -o nounset
+set -o pipefail
+set -o xtrace
 
 echo "BUILD - Will now build Docker container"
 docker build -t edwardotme/raspbian-customiser:$TRAVIS_BRANCH .
