@@ -36,7 +36,6 @@ PART_START=$((($ROOT_END + 1) / $BLOCK))
 PART_START=$((($PART_START + 1) * $BLOCK))
 
 # Work out how much to expand the image to fit the new partition
-PART_EXPAND=
 # Convert PART_SIZE from MiB to B
 PART_EXPAND=$(($PART_SIZE * 1024 * 1024))
 # Add the free space gap required between the end of the previous
