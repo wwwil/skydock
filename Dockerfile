@@ -16,5 +16,6 @@ WORKDIR /build/
 
 COPY build.sh /build/
 COPY add-partition.sh /build/
+COPY mount.sh /build/
 
 ENTRYPOINT /build/build.sh
