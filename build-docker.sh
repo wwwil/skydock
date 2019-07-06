@@ -27,7 +27,7 @@ else
 fi
 
 echo "BUILD - Will now build Docker container"
-docker build -t edwardotme/raspbian-customiser:$BRANCH .
+docker build -t lumastar/raspbian-customiser:$BRANCH .
 
 echo "TEST - Will now test built Docker container"
 IMAGE_LINK=http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2018-10-11/2018-10-09-raspbian-stretch-lite.zip
@@ -43,12 +43,12 @@ docker run --privileged --rm \
   -e SCRIPT=/test/test.sh \
   -e ADD_DATA_PART=true \
   --mount type=bind,source="$(pwd)"/test,destination=/test \
-  edwardotme/raspbian-customiser:$BRANCH
+  lumastar/raspbian-customiser:$BRANCH
 
 if [ ! -z "$TAG" ]; then
 	# Only push image if TAG is set
-	echo "DEPLOY - Will now push Docker image to Docker Hub as $TAG"
-	echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
-	docker tag edwardotme/raspbian-customiser:$BRANCH edwardotme/raspbian-customiser:$TAG
-	docker push edwardotme/raspbian-customiser:$TAG
+	echo "DEPLOY - Will now push Docker image to Quay.io repository as $TAG"
+	echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin quay.io
+	docker tag lumastar/raspbian-customiser:$BRANCH quay.io/lumastar/raspbian-customiser:$TAG
+	docker push quay.io/lumastar/raspbian-customiser:$TAG
 fi
