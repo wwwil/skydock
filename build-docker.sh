@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 set -o errexit
-# set -o nounset
 set -o pipefail
 set -o xtrace
 
@@ -15,16 +14,17 @@ if [ ! -z "$TRAVIS_BRANCH" ]; then
 	fi
 	# Only Travis should push images, so we only need to use the tag with Travis
 	TAG=$TRAVIS_TAG
-	# For the master branch use the "latest" tag
-	if [ $BRANCH == "master" ]; then
-		TAG="latest"
-	fi
 elif [ ! -z "$CI_COMMIT_REF_NAME" ]; then
 	# This is also run in GitLab CI, for build and test only. 
 	BRANCH="$CI_COMMIT_REF_NAME"
 else
 	exit 1
 fi
+
+# Set TAG to false if unset
+TAG="${TAG:-false}"
+# Delay setting this until all used variables are set
+set -o nounset
 
 echo "BUILD - Will now build Docker container"
 docker build -t lumastar/raspbian-customiser:$BRANCH .
@@ -45,8 +45,8 @@ docker run --privileged --rm \
   --mount type=bind,source="$(pwd)"/test,destination=/test \
   lumastar/raspbian-customiser:$BRANCH
 
-if [ ! -z "$TAG" ]; then
-	# Only push image if TAG is set
+if [ "$TAG" != "false" ]; then
+	# Only push image if TAG is not false
 	echo "DEPLOY - Will now push Docker image to Quay.io repository as $TAG"
 	echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin quay.io
 	docker tag lumastar/raspbian-customiser:$BRANCH quay.io/lumastar/raspbian-customiser:$TAG
