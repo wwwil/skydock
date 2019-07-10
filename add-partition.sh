@@ -90,7 +90,7 @@ ROOT_PARTUUID="${IMG_ID}-02"
 DATA_PARTUUID="${IMG_ID}-03"
 sed -i "s/PARTUUID=[a-z0-9]*-01/PARTUUID=${BOOT_PARTUUID}/" "${ROOTFS_DIR}/etc/fstab"
 sed -i "s/PARTUUID=[a-z0-9]*-02/PARTUUID=${ROOT_PARTUUID}/" "${ROOTFS_DIR}/etc/fstab"
-echo "PARTUUID=${DATA_PARTUUID} ${PART_MOUNT} vfat defaults 0 1" >> "${ROOTFS_DIR}/etc/fstab"
+echo "PARTUUID=${DATA_PARTUUID} ${PART_MOUNT} vfat defaults,umask=0000 0 0" >> "${ROOTFS_DIR}/etc/fstab"
 echo "FSTAB:"
 cat "${ROOTFS_DIR}/etc/fstab"
 
