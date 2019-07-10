@@ -13,4 +13,4 @@ stages:
 job test:
   stage: test
   script:
-    - ./build-docker.sh
+    - ./build.sh

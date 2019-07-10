@@ -1,55 +1,54 @@
 #!/usr/bin/env bash
 
 set -o errexit
-set -o nounset
 set -o pipefail
 set -o xtrace
 
-ADD_DATA_PART=${ADD_DATA_PART:-false}
-
-# These are the env vars that should be passed in from docker
-echo "MOUNT: $MOUNT"
-echo "SOURCE_IMAGE: $SOURCE_IMAGE"
-echo "SCRIPT: $SCRIPT"
-echo "ADD_DATA_PART: $ADD_DATA_PART"
-
-# If ADD_DATA_PART is true then add a data partiton
-if [ $ADD_DATA_PART != false ]; then
-	source ./add-partition.sh $SOURCE_IMAGE
-	# The add-partition script runs mount
+if [ ! -z "$TRAVIS_BRANCH" ]; then
+	# For tag builds TRAVIS_BRANCH is set to the tag name
+	BRANCH=$TRAVIS_BRANCH
+	# For PR builds branch is the target branch
+	if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
+		# Change the branch name for PR builds so we don't create a tag
+		BRANCH="${BRANCH}-${TRAVIS_PULL_REQUEST}"
+	fi
+	# Only Travis should push images, so we only need to use the tag with Travis
+	TAG=$TRAVIS_TAG
+elif [ ! -z "$CI_COMMIT_REF_NAME" ]; then
+	# This is also run in GitLab CI, for build and test only. 
+	BRANCH="$CI_COMMIT_REF_NAME"
 else
-	# Or mount is run here directly
-	source ./mount.sh $SOURCE_IMAGE
+	exit 1
 fi
 
-# The add-partition or mount scripts must set LOOP_DEV and ROOTFS_DIR
-echo "LOOP_DEV: $LOOP_DEV"
-echo "ROOTFS_DIR: $ROOTFS_DIR"
+# Set TAG to false if unset
+TAG="${TAG:-false}"
+# Delay setting this until all used variables are set
+set -o nounset
 
-# Bind mount the directory specified as MOUNT. This is for scripts to run
-# inside Raspbian and data to copy in
-mkdir ${ROOTFS_DIR}/${MOUNT}
-mount --bind $MOUNT ${ROOTFS_DIR}/${MOUNT}
+echo "BUILD - Will now build Docker container"
+docker build -t lumastar/raspbian-customiser:$BRANCH .
 
-# Apply ld.so.preload fix
-sed -i 's/^/#CHROOT /g' /mnt/raspbian/etc/ld.so.preload
+echo "TEST - Will now test built Docker container"
+IMAGE_LINK=http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2018-10-11/2018-10-09-raspbian-stretch-lite.zip
+cd test/
+wget -nv $IMAGE_LINK
+IMAGE_ZIP=$(basename $IMAGE_LINK)
+unzip -o $IMAGE_ZIP
+rm $IMAGE_ZIP
+cd ..
+docker run --privileged --rm \
+  -e MOUNT=/test \
+  -e SOURCE_IMAGE=/test/${IMAGE_ZIP%.zip}.img \
+  -e SCRIPT=/test/test.sh \
+  -e ADD_DATA_PART=true \
+  --mount type=bind,source="$(pwd)"/test,destination=/test \
+  lumastar/raspbian-customiser:$BRANCH
 
-# Copy qemu binary
-cp /usr/bin/qemu-arm-static ${ROOTFS_DIR}/usr/bin/
-
-# Enable qemu-arm
-update-binfmts --enable qemu-arm
-
-# Chroot to the mounted Raspbian environment and run the SCRIPT
-chroot ${ROOTFS_DIR} $SCRIPT
-
-# Revert ld.so.preload fix
-sed -i 's/^#CHROOT //g' ${ROOTFS_DIR}/etc/ld.so.preload
-
-# Unmount everything
-if [ $ADD_DATA_PART != false ]; then
-	umount ${ROOTFS_DIR}/data
+if [ "$TAG" != "false" ]; then
+	# Only push image if TAG is not false
+	echo "DEPLOY - Will now push Docker image to Quay.io repository as $TAG"
+	echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin quay.io
+	docker tag lumastar/raspbian-customiser:$BRANCH quay.io/lumastar/raspbian-customiser:$TAG
+	docker push quay.io/lumastar/raspbian-customiser:$TAG
 fi
-umount ${ROOTFS_DIR}/{dev/pts,dev,sys,proc,boot,${MOUNT},}
-losetup -d $LOOP_DEV
-echo "SUCCESSFULLY UNMOUNTED IMG"
