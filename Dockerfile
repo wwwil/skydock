@@ -12,10 +12,10 @@ RUN apt-get -y update && \
 	dosfstools \
 	xxd
 
-WORKDIR /build/
+WORKDIR /raspbian-customiser/
 
-COPY build.sh /build/
-COPY add-partition.sh /build/
-COPY mount.sh /build/
+COPY customise.sh /raspbian-customiser/
+COPY add-partition.sh /raspbian-customiser/
+COPY mount.sh /raspbian-customiser/
 
-ENTRYPOINT /build/build.sh
+ENTRYPOINT /raspbian-customiser/customise.sh
