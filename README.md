@@ -2,30 +2,75 @@
 
 [![Build Status](https://travis-ci.com/lumastar/raspbian-customiser.svg?branch=master)](https://travis-ci.com/lumastar/raspbian-customiser)
 
-Tool to customise a Raspbian image by mounting it as a loop device and running commands in it with *chroot* and *qemu*. This enables automated creation of the customised Rasbian images, and is designed to use in CI/CD pipelines to package software into a pre-configured image which can easily be deployed to a Raspberry Pi.
+*raspbian-customiser* is a tool to customise a Raspbian image.
+It works by taking an existing Raspbian `.img` image, mounting it as a loop device, and running commands in the Raspbian environment using *chroot* and *qemu*.
 
-*raspbian-customiser* is packaged as a Docker image. The latest stable version can be pulled from the repo with:
+This enables automated creation of the customised Rasbian images, and is designed to be used in CI/CD pipelines to package software into a pre-configured image which can easily be deployed to a Raspberry Pi.
 
-```
-docker pull edwardotme/raspbian-customiser:latest
-```
+It can also append a FAT32 format data partition to the `.img`, and add this to Raspbian's `/etc/fstab` for automatic mounting.
+This is to provide an easy place to drop data files when writing the `.img` to SD cards that its compatible with all operating systems.
 
-To use it, group any scripts and asset files in a directory. Then mount this directory as a Docker volume when running the container.
+## Usage
 
-To mount the directory in the Raspbian environment specify it's path with the `MOUNT` environment variable.
+### Image
 
-To specify a script to run in the Raspbian environment use the `SCRIPT` environment variable. This should point to your main script in the mounted volume which can apply whatever modifications you require and copy any asset files from the volume to their desired location.
-
-The source image file can also be specified with `SOURCE_IMAGE`. This should be the path to an `.img` file, also found in your mounted volume.
-
-A FAT32 format data partition can be added to the end of the image if `ADD_DATA_PART` is set to `true`. This partiton can be helpful when writing the image to an SD card in macOS and Windows as data files can be placed there. The partition will be `64MiB`, labeled `DATA`, and mounted at `/data`. The `/etc/fstab` and `/boot/config.txt` files will be updated with correct `PARTUUID`s.
+*raspbian-customiser* is packaged as a Docker image.
+The latest stable version can be pulled from the [Quay.io repository](https://quay.io/repository/lumastar/raspbian-customiser) with:
 
 ```
-docker run --privileged \
--e MOUNT=/customisations \
--e SOURCE_IMAGE=/customisations/raspbian-lite.img \
--e SCRIPT=/customisations/customise.sh \
--e ADD_DATA_PART=true \
---mount source=customisations,destination=/customisations \
-edwardotme/raspbian-customiser:latest
+docker pull quay.io/lumastar/raspbian-customiser:latest
 ```
+
+For use in automation it's advised that a version tag is given explicitly.
+Released versions with notes can be found in the releases page on GitHub.
+
+### Running
+
+To use *raspbian-customiser* first group required resources in a directory.
+This must include the source `.img`, and a script to run inside the Raspbian environment.
+It can also include other assets such as sub scripts and data files to be copied over.
+
+This directory must be mounted as a Docker volume when running the container.
+
+The source `.img` is specified with `SOURCE_IMAGE`.
+This is the Raspbian environment that the scripts will run in.
+
+The directory containing resources to use inside the Raspbian environment must be specified using the `MOUNT` environment variable.
+It will be mounted at the root of the Raspbian environment.
+
+The script to run can be specified using the `SCRIPT` environment variable.
+This script must be inside the `MOUNT` directory.
+
+```
+$ docker run --privileged \
+    -e SOURCE_IMAGE=/resources/raspbian-lite.img \
+    -e MOUNT=/resources/customisations \
+    -e SCRIPT=/customisations/customise.sh \
+    --mount source=resources,destination=/resources \
+    lumastar/raspbian-customiser:latest
+```
+
+### Data Partition
+
+A FAT32 format data partition can be added to the end of the `.img` if `ADD_DATA_PART` is set to `true`.
+The partition will be `64MiB`, labelled `DATA`, and mounted at `/data`.
+The `/etc/fstab` and `/boot/config.txt` files will be updated with correct `PARTUUID`s.
+
+```
+$ docker run --privileged \
+    ...
+    -e ADD_DATA_PART=true \
+    ...
+    lumastar/raspbian-customiser:latest
+```
+
+This partition can be helpful when writing the `.img` to an SD card in macOS and Windows as data files can be placed there.
+
+## CI/CD
+
+Travis is used to automatically build the Docker image and run tests.
+For tagged builds it also pushes the image to the [Quay.io repository](https://quay.io/repository/lumastar/raspbian-customiser).
+
+GitLab CI is also used to build and test the image.
+This is because the two CI/CD systems seem to handle loop devices differently.
+As the raspbian-customiser is used by projects in both environments its important that both are functional.

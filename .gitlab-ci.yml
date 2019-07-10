@@ -1,0 +1,16 @@
+image: docker:stable
+
+services:
+  - docker:dind
+
+before_script:
+  - docker info
+  - apk update && apk add bash
+
+stages:
+  - test
+
+job test:
+  stage: test
+  script:
+    - ./build-docker.sh

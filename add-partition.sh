@@ -67,28 +67,9 @@ parted -s "${IMG_FILE}" unit b print free
 # Check the partiton is optimally aligned
 parted -s "${IMG_FILE}" align-check opt 3
 
-# Mount the image as a loop device
-LOOP_DEV=$(losetup --show --find --partscan $IMG_FILE)
-# Wait a second or mount may fail
-sleep 1
-# Get list of partitions, drop the first line, as this is our
-# LOOP_DEV itself, we only what the child partitions
-PARTITIONS=$(lsblk --raw --output "MAJ:MIN" --noheadings ${LOOP_DEV} | tail -n +2)
-# Manually use mknod to create nodes for partitons on loop device
-# Testing indicates this is required when running in a container,
-# even if the containter is run --pivileged
-COUNTER=1
-for i in $PARTITIONS; do
-    MAJ=$(echo $i | cut -d: -f1)
-    MIN=$(echo $i | cut -d: -f2)
-    if [ ! -e "${LOOP_DEV}p${COUNTER}" ]; then mknod ${LOOP_DEV}p${COUNTER} b $MAJ $MIN; fi
-    COUNTER=$((COUNTER + 1))
-done
-# Make mount point and mount image
-ROOTFS_DIR=/mnt/raspbian
-mkdir -p $ROOTFS_DIR
-mount -o rw ${LOOP_DEV}p2 $ROOTFS_DIR
-mount -o rw ${LOOP_DEV}p1 ${ROOTFS_DIR}/boot
+# Mount the image
+source ./mount.sh $IMG_FILE
+# This script must set LOOP_DEV and ROOTFS_DIR
 
 # Format the partiton
 PART_NAME=$(echo $PART_NAME | tr a-z A-Z )
@@ -97,15 +78,9 @@ mkdosfs -n "${PART_NAME}" -F 32 -v "${LOOP_DEV}p3" > /dev/null
 # Use parted to print the partition table
 parted -s "${IMG_FILE}" unit b print free
 
-# Create the mount point
-mkdir /mnt/raspbian/$PART_MOUNT
-mount -o rw ${LOOP_DEV}p2 ${ROOTFS_DIR}/${PART_MOUNT}
-
-# List the contents of mount point to verify mount was successful
-echo "CONTENTS OF /:"
-ls ${ROOTFS_DIR}
-echo "CONTENTS OF /boot:"
-ls ${ROOTFS_DIR}/boot
+# Create the mount point and mount the new partition
+mkdir ${ROOTFS_DIR}/${PART_MOUNT}
+mount -o rw ${LOOP_DEV}p3 ${ROOTFS_DIR}/${PART_MOUNT}
 
 # Add the partition mount to /etc/fstab
 IMG_ID="$(dd if="${IMG_FILE}" skip=440 bs=1 count=4 2>/dev/null | xxd -e | cut -f 2 -d' ')"
@@ -126,8 +101,3 @@ sed -i "s/PARTUUID=[a-z0-9]*-02/PARTUUID=${ROOT_PARTUUID}/" "${ROOTFS_DIR}/boot/
 sed -i "s/init=.*//" "${ROOTFS_DIR}/boot/cmdline.txt"
 echo "CMDLINE.TXT:"
 cat "${ROOTFS_DIR}/boot/cmdline.txt"
-
-# Unmount partitions and reset loop device
-umount /mnt/raspbian/{${PART_MOUNT},boot,}
-losetup -d $LOOP_DEV
-echo "SUCCESSFULLY ADDED PARTITION AND UNMOUNTED IMG"
