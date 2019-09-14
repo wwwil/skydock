@@ -26,7 +26,7 @@ The latest stable version can be pulled from the
 with:
 
 ```
-docker pull quay.io/lumastar/raspbian-customiser:v0.2.2
+docker pull quay.io/lumastar/raspbian-customiser:v0.2.3
 ```
 
 A version tag should be given explicitly.
@@ -58,7 +58,7 @@ $ docker run --privileged \
     -e MOUNT=/resources/customisations \
     -e SCRIPT=/customisations/customise.sh \
     --mount type=bind,source=$(pwd)/resources,destination=/resources \
-    lumastar/raspbian-customiser:v0.2.2
+    lumastar/raspbian-customiser:v0.2.3
 ```
 
 ### Data Partition
@@ -74,11 +74,30 @@ $ docker run --privileged \
     ...
     -e ADD_DATA_PART=true \
     ...
-    lumastar/raspbian-customiser:v0.2.2
+    lumastar/raspbian-customiser:v0.2.3
 ```
 
 This partition can be helpful when writing the `.img` to an SD card in macOS
 and Windows as data files can be placed there.
+
+### Expanding Main Partition
+
+The main Raspbian partition can be expanded
+using the `EXPAND` environment variable.
+This will add the specified number of megabytes (Mib)
+to the end of the second partition before the data partition is added.
+For example,
+the main partition can be expanded by 200Mib like so:
+
+```
+$ docker run --privileged \
+    ...
+    -e EXPAND=200 \
+    ...
+    lumastar/raspbian-customiser:v0.2.3
+```
+
+This can be helpful to make more space in Raspbian for installing applications.
 
 ## CI/CD
 
