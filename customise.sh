@@ -6,12 +6,19 @@ set -o pipefail
 set -o xtrace
 
 ADD_DATA_PART=${ADD_DATA_PART:-false}
+EXPAND=${EXPAND:-0}
 
 # These are the env vars that should be passed in from docker
 echo "MOUNT: $MOUNT"
 echo "SOURCE_IMAGE: $SOURCE_IMAGE"
 echo "SCRIPT: $SCRIPT"
 echo "ADD_DATA_PART: $ADD_DATA_PART"
+echo "EXPAND: $EXPAND"
+
+# If expand has been set then run the expand script
+if [ $EXPAND -gt "0" ]; then
+    source ./expand.sh $EXPAND
+fi
 
 # If ADD_DATA_PART is true then add a data partiton
 if [ $ADD_DATA_PART != false ]; then

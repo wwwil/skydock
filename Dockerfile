@@ -17,5 +17,6 @@ WORKDIR /raspbian-customiser/
 COPY customise.sh /raspbian-customiser/
 COPY add-partition.sh /raspbian-customiser/
 COPY mount.sh /raspbian-customiser/
+COPY expand.sh /raspbian-customiser/
 
 ENTRYPOINT /raspbian-customiser/customise.sh
