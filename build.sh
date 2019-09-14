@@ -42,6 +42,7 @@ docker run --privileged --rm \
   -e SOURCE_IMAGE=/test/${IMAGE_ZIP%.zip}.img \
   -e SCRIPT=/test/test.sh \
   -e ADD_DATA_PART=true \
+  -e EXPAND=200 \
   --mount type=bind,source="$(pwd)"/test,destination=/test \
   lumastar/raspbian-customiser:$BRANCH
 
