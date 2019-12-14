@@ -23,7 +23,11 @@ SIZE_AFTER=$(parted -s "${SOURCE_IMAGE}" unit Mib print | grep -e '^ 2' \
 | xargs echo -n | cut -d" " -f 4 | tr -d MiB)
 
 SIZE_DIFFERENCE=$(($SIZE_AFTER - $SIZE_BEFORE))
-if [ "$SIZE_DIFFERENCE" != "$EXPAND" ]; then
+# Expanding to 100% may actually expand the partition slightly more than the
+# specified amount as the image file may have other empty space at the end. As
+# long as the size difference isn't less than the specified amount then this
+# check can pass.
+if [ "$SIZE_DIFFERENCE" -lt "$EXPAND" ]; then
     echo "Expand error, SIZE_BEFORE: $SIZE_BEFORE, SIZE_AFTER: $SIZE_AFTER, SIZE_DIFFERENCE: $SIZE_DIFFERENCE"
     exit 1
 fi
