@@ -17,6 +17,8 @@ if [ ! -z "$TRAVIS_BRANCH" ]; then
 elif [ ! -z "$CI_COMMIT_REF_NAME" ]; then
 	# This is also run in GitLab CI, for build and test only. 
 	BRANCH="$CI_COMMIT_REF_NAME"
+elif [ ! -z "$LOCAL" ]; then
+    BRANCH="local-test"
 else
 	exit 1
 fi
@@ -31,11 +33,12 @@ docker build -t lumastar/raspbian-customiser:$BRANCH .
 
 echo "TEST - Will now test built Docker container"
 IMAGE_LINK=http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2018-10-11/2018-10-09-raspbian-stretch-lite.zip
-cd test/
-wget -nv $IMAGE_LINK
 IMAGE_ZIP=$(basename $IMAGE_LINK)
+cd test/
+if [ ! -f "$IMAGE_ZIP" ]; then
+    wget -nv $IMAGE_LINK
+fi
 unzip -o $IMAGE_ZIP
-rm $IMAGE_ZIP
 cd ..
 docker run --privileged --rm \
   -e MOUNT=/test \

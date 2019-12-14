@@ -1,0 +1,5 @@
+test/
+.gitignore
+.gitlab-ci.yml
+.travis.yml
+README.md
