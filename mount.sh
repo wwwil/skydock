@@ -42,6 +42,13 @@ for i in $PARTITIONS; do
     COUNTER=$((COUNTER + 1))
 done
 
+# If we expanded the root partition we must also expand the file system. This
+# must be done after loop device creation but before mounting.
+if [ $EXPAND -gt "0" ]; then
+    e2fsck -f ${LOOP_DEV}p2
+    resize2fs ${LOOP_DEV}p2
+fi
+
 # Make mount point, mount image and make the ROOTFS_DIR env var available to
 # other scripts
 export ROOTFS_DIR=/mnt/raspbian
