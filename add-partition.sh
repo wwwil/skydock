@@ -9,6 +9,8 @@ set -o xtrace
 
 IMG_FILE=$1
 
+echo "IMG_FILE: $IMG_FILE"
+
 # These could be set by args
 # Size should be in MiB
 PART_SIZE=64
