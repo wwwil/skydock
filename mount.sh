@@ -5,6 +5,8 @@ set -o nounset
 set -o pipefail
 set -o xtrace
 
+IMG_FILE=$1
+
 # We can do this the easy way, or the hard way...
 if [ -e /dev/loop0 ]; then
 	# Mount the image as a loop device
