@@ -45,7 +45,7 @@ done
 # If we expanded the root partition we must also expand the file system. This
 # must be done after loop device creation but before mounting.
 if [ $EXPAND -gt "0" ]; then
-    e2fsck -f ${LOOP_DEV}p2
+    e2fsck -fp -B 512 ${LOOP_DEV}p2
     resize2fs ${LOOP_DEV}p2
 fi
 
