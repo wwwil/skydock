@@ -29,6 +29,13 @@ else
 	source ./mount.sh $SOURCE_IMAGE
 fi
 
+# If we expanded the root partition now that the image is mounted we must also
+# expand the file system
+if [ $EXPAND -gt "0" ]; then
+    e2fsck -f ${LOOP_DEV}p2
+    resize2fs ${LOOP_DEV}p2
+fi
+
 # The add-partition or mount scripts must set LOOP_DEV and ROOTFS_DIR
 echo "LOOP_DEV: $LOOP_DEV"
 echo "ROOTFS_DIR: $ROOTFS_DIR"
