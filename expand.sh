@@ -8,18 +8,37 @@ set -o xtrace
 # Set EXPAND to first argument, or 0 if not provided
 EXPAND="${1:-0}"
 
+echo "SOURCE_IMAGE: $SOURCE_IMAGE"
+echo "EXPAND: $EXPAND"
+
 # Determine the current size of the partition
-SIZE_BEFORE=$(parted -s "${SOURCE_IMAGE}" unit Mib print | grep -e '^ 2' \
+SIZE_BEFORE=$(parted -s "${SOURCE_IMAGE}" unit MiB print | grep -e '^ 2' \
 | xargs echo -n | cut -d" " -f 4 | tr -d MiB)
 
-# Add EXPAND * 1M to the end of the image
-dd bs=1M if=/dev/zero count=$EXPAND >> $SOURCE_IMAGE
+# Find the end of the root partition
+# This assumes there are two partitions
+ROOT_END=$(parted -s "${SOURCE_IMAGE}" unit MiB print | grep -e '^ 2' \
+| xargs echo -n | cut -d" " -f 3 | tr -d MiB)
+
+ROOT_END_NEW=$(($ROOT_END + $EXPAND))
+
+parted -s "${SOURCE_IMAGE}" unit MiB print free
+
+# Expand the image slightly more than required for the new partition
+dd bs=1M if=/dev/zero count=$(($EXPAND + 1)) >> $SOURCE_IMAGE
+
+parted -s "${SOURCE_IMAGE}" unit MiB print free
 
 # Resize the second partition to fill the free space
-parted -s "${SOURCE_IMAGE}" resizepart 2 100%
+parted -s "${SOURCE_IMAGE}" resizepart 2 "${ROOT_END_NEW}MiB"
+
+parted -s "${SOURCE_IMAGE}" unit MiB print free
+
+# Check the partition is optimally aligned
+parted -s "${SOURCE_IMAGE}" align-check opt 2
 
 # Determine the new size of the partition
-SIZE_AFTER=$(parted -s "${SOURCE_IMAGE}" unit Mib print | grep -e '^ 2' \
+SIZE_AFTER=$(parted -s "${SOURCE_IMAGE}" unit MiB print | grep -e '^ 2' \
 | xargs echo -n | cut -d" " -f 4 | tr -d MiB)
 
 SIZE_DIFFERENCE=$(($SIZE_AFTER - $SIZE_BEFORE))

@@ -5,6 +5,8 @@ set -o nounset
 set -o pipefail
 set -o xtrace
 
+IMG_FILE=$1
+
 # We can do this the easy way, or the hard way...
 if [ -e /dev/loop0 ]; then
 	# Mount the image as a loop device
@@ -39,6 +41,13 @@ for i in $PARTITIONS; do
     if [ ! -e "${LOOP_DEV}p${COUNTER}" ]; then mknod ${LOOP_DEV}p${COUNTER} b $MAJ $MIN; fi
     COUNTER=$((COUNTER + 1))
 done
+
+# If we expanded the root partition we must also expand the file system. This
+# must be done after loop device creation but before mounting.
+if [ $EXPAND -gt "0" ]; then
+    e2fsck -fp -B 512 ${LOOP_DEV}p2
+    resize2fs ${LOOP_DEV}p2
+fi
 
 # Make mount point, mount image and make the ROOTFS_DIR env var available to
 # other scripts

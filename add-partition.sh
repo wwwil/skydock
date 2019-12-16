@@ -9,6 +9,8 @@ set -o xtrace
 
 IMG_FILE=$1
 
+echo "IMG_FILE: $IMG_FILE"
+
 # These could be set by args
 # Size should be in MiB
 PART_SIZE=64
@@ -64,7 +66,7 @@ parted -a none -s "${IMG_FILE}" mkpart primary "${PART_TYPE}" "${PART_START}B" 1
 # Use parted to print the partition table
 parted -s "${IMG_FILE}" unit b print free
 
-# Check the partiton is optimally aligned
+# Check the partition is optimally aligned
 parted -s "${IMG_FILE}" align-check opt 3
 
 # Mount the image
