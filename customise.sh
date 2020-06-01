@@ -67,5 +67,5 @@ if [ $ADD_DATA_PART != false ]; then
 	umount ${ROOTFS_DIR}/data
 fi
 umount ${ROOTFS_DIR}/{dev/pts,dev,sys,proc,boot,${MOUNT},}
-losetup -d $LOOP_DEV
+losetup --detach $LOOP_DEV
 echo "SUCCESSFULLY UNMOUNTED IMG"
