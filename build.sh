@@ -5,17 +5,18 @@ set -o pipefail
 set -o xtrace
 
 if [ ! -z "$TRAVIS_BRANCH" ]; then
-	# For tag builds TRAVIS_BRANCH is set to the tag name
+	# For tag builds `TRAVIS_BRANCH` is set to the tag name.
 	BRANCH=$TRAVIS_BRANCH
-	# For PR builds branch is the target branch
+	# For PR builds branch is the target branch.
 	if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
-		# Change the branch name for PR builds so we don't create a tag
+		# Change the branch name for PR builds so we don't create a tag.
 		BRANCH="${BRANCH}-${TRAVIS_PULL_REQUEST}"
 	fi
-	# Only Travis should push images, so we only need to use the tag with Travis
+	# Only Travis should push images, so we only need to use the tag with
+    # Travis.
 	TAG=$TRAVIS_TAG
 elif [ ! -z "$CI_COMMIT_REF_NAME" ]; then
-	# This is also run in GitLab CI, for build and test only. 
+	# This is also run in GitLab CI, for build and test only.
 	BRANCH="$CI_COMMIT_REF_NAME"
 elif [ ! -z "$LOCAL" ]; then
     BRANCH="local-test"
@@ -23,9 +24,9 @@ else
 	exit 1
 fi
 
-# Set TAG to false if unset
+# Default `TAG` to `false` if unset.
 TAG="${TAG:-false}"
-# Delay setting this until all used variables are set
+# Delay setting `nounset` until all used variables are set.
 set -o nounset
 
 echo "BUILD - Will now build Docker container"
@@ -62,7 +63,7 @@ IMAGE_LINK=https://downloads.raspberrypi.org/raspios_arm64/images/raspios_arm64-
 test $IMAGE_LINK
 
 if [ "$TAG" != "false" ]; then
-	# Only push image if TAG is not false
+	# Only push an image if `TAG` is not false.
 	echo "DEPLOY - Will now push Docker image to Quay.io repository as $TAG"
 	echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin quay.io
 	docker tag lumastar/raspbian-customiser:$BRANCH quay.io/lumastar/raspbian-customiser:$TAG

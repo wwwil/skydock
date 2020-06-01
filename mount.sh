@@ -18,16 +18,13 @@ LOOP_DEV=$(losetup --show --partscan $LOOP_DEV $IMG_FILE)
 # Make the LOOP_DEV environment variable available to other scripts.
 export LOOP_DEV
 
-# Wait a second or mount may fail
+# Wait a second or mount may fail.
 sleep 1
 
-# Get list of partitions, drop the first line, as this is our
-# LOOP_DEV itself, we only what the child partitions
+# Get a list of partitions in the image.
 PARTITIONS=$(lsblk --raw --output "MAJ:MIN" --noheadings ${LOOP_DEV} | tail -n +2)
 
-# Manually use mknod to create nodes for partitons on loop device
-# Testing indicates this is required when running in a container,
-# even if the containter is run --pivileged
+# Manually use `mknod` to create nodes for partitions on the loop device.
 COUNTER=1
 for i in $PARTITIONS; do
     MAJ=$(echo $i | cut -d: -f1)
@@ -36,8 +33,8 @@ for i in $PARTITIONS; do
     COUNTER=$((COUNTER + 1))
 done
 
-# If we expanded the root partition we must also expand the file system. This
-# must be done after loop device creation but before mounting.
+# If we previously expanded the root partition we must also expand the file
+# system. This must be done after loop device creation but before mounting.
 if [ $EXPAND -gt "0" ]; then
     e2fsck -fp -B 512 ${LOOP_DEV}p2
     resize2fs ${LOOP_DEV}p2
@@ -56,7 +53,7 @@ mount --bind /sys ${ROOTFS_DIR}/sys/
 mount --bind /proc ${ROOTFS_DIR}/proc/
 mount --bind /dev/pts ${ROOTFS_DIR}/dev/pts
 
-# List the contents of mount point to verify mount was successful
+# List the contents of mount point to verify mount was successful.
 echo "CONTENTS OF /:"
 ls ${ROOTFS_DIR}
 echo "CONTENTS OF /boot:"
