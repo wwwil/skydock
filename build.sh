@@ -32,22 +32,34 @@ echo "BUILD - Will now build Docker container"
 docker build -t lumastar/raspbian-customiser:$BRANCH .
 
 echo "TEST - Will now test built Docker container"
+
+function test {
+    IMAGE_LINK=$1
+    echo $IMAGE_LINK
+    IMAGE_ZIP=$(basename $IMAGE_LINK)
+    cd test/
+    if [ ! -f "$IMAGE_ZIP" ]; then
+       wget -nv $IMAGE_LINK
+    fi
+    unzip -o $IMAGE_ZIP
+    cd ..
+    docker run --privileged --rm \
+      -e MOUNT=/test \
+      -e SOURCE_IMAGE=/test/${IMAGE_ZIP%.zip}.img \
+      -e SCRIPT=/test/test.sh \
+      -e ADD_DATA_PART=true \
+      -e EXPAND=100 \
+      --mount type=bind,source="$(pwd)"/test,destination=/test \
+      lumastar/raspbian-customiser:$BRANCH
+}
+
+echo "TEST - Testing with Raspbian Stretch Lite 2018-10-11"
 IMAGE_LINK=http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2018-10-11/2018-10-09-raspbian-stretch-lite.zip
-IMAGE_ZIP=$(basename $IMAGE_LINK)
-cd test/
-if [ ! -f "$IMAGE_ZIP" ]; then
-    wget -nv $IMAGE_LINK
-fi
-unzip -o $IMAGE_ZIP
-cd ..
-docker run --privileged --rm \
-  -e MOUNT=/test \
-  -e SOURCE_IMAGE=/test/${IMAGE_ZIP%.zip}.img \
-  -e SCRIPT=/test/test.sh \
-  -e ADD_DATA_PART=true \
-  -e EXPAND=200 \
-  --mount type=bind,source="$(pwd)"/test,destination=/test \
-  lumastar/raspbian-customiser:$BRANCH
+test $IMAGE_LINK
+
+echo "TEST - Testing with RasPi OS Buster arm64 2020-05-28"
+IMAGE_LINK=https://downloads.raspberrypi.org/raspios_arm64/images/raspios_arm64-2020-05-28/2020-05-27-raspios-buster-arm64.zip
+test $IMAGE_LINK
 
 if [ "$TAG" != "false" ]; then
 	# Only push image if TAG is not false
