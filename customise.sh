@@ -38,8 +38,10 @@ echo "ROOTFS_DIR: $ROOTFS_DIR"
 mkdir ${ROOTFS_DIR}/${MOUNT}
 mount --bind $MOUNT ${ROOTFS_DIR}/${MOUNT}
 
-# Apply ld.so.preload fix
-sed -i 's/^/#CHROOT /g' /mnt/raspbian/etc/ld.so.preload
+# Apply `ld.so.preload` fix.
+if [ -f ${ROOTFS_DIR}/etc/ld.so.preload ]; then
+    sed -i 's/^/#CHROOT /g' ${ROOTFS_DIR}/etc/ld.so.preload
+fi
 
 # Copy the `qemu` binary for arm and arm64 into the image.
 cp /usr/bin/qemu-arm-static ${ROOTFS_DIR}/usr/bin/
@@ -52,8 +54,10 @@ update-binfmts --enable qemu-aarch64
 # Chroot to the mounted Raspbian environment and run the SCRIPT
 chroot ${ROOTFS_DIR} $SCRIPT
 
-# Revert ld.so.preload fix
-sed -i 's/^#CHROOT //g' ${ROOTFS_DIR}/etc/ld.so.preload
+# Revert `ld.so.preload` fix if it was applied.
+if [ -f ${ROOTFS_DIR}/etc/ld.so.preload ]; then
+    sed -i 's/^#CHROOT //g' ${ROOTFS_DIR}/etc/ld.so.preload
+fi
 
 # Unmount everything
 if [ $ADD_DATA_PART != false ]; then
