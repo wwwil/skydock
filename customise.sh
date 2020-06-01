@@ -41,11 +41,13 @@ mount --bind $MOUNT ${ROOTFS_DIR}/${MOUNT}
 # Apply ld.so.preload fix
 sed -i 's/^/#CHROOT /g' /mnt/raspbian/etc/ld.so.preload
 
-# Copy qemu binary
+# Copy the `qemu` binary for arm and arm64 into the image.
 cp /usr/bin/qemu-arm-static ${ROOTFS_DIR}/usr/bin/
+cp /usr/bin/qemu-aarch64-static ${ROOTFS_DIR}/usr/bin/
 
-# Enable qemu-arm
+# Enable `qemu-arm` and `qemu-aarch64` for arm64.
 update-binfmts --enable qemu-arm
+update-binfmts --enable qemu-aarch64
 
 # Chroot to the mounted Raspbian environment and run the SCRIPT
 chroot ${ROOTFS_DIR} $SCRIPT
