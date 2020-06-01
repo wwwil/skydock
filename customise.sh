@@ -51,7 +51,10 @@ cp /usr/bin/qemu-aarch64-static ${ROOTFS_DIR}/usr/bin/
 update-binfmts --enable qemu-arm
 update-binfmts --enable qemu-aarch64
 
-# Chroot to the mounted Raspbian environment and run the SCRIPT
+# Ensure `SCRIPT` is executable.
+chmod +x $SCRIPT
+
+# `chroot` into the mounted image and run the `SCRIPT`.
 chroot ${ROOTFS_DIR} $SCRIPT
 
 # Revert `ld.so.preload` fix if it was applied.
