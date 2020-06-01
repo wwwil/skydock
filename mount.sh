@@ -7,21 +7,15 @@ set -o xtrace
 
 IMG_FILE=$1
 
-# We can do this the easy way, or the hard way...
-if [ -e /dev/loop0 ]; then
-	# Mount the image as a loop device
-	LOOP_DEV=$(losetup --show --find --partscan $IMG_FILE)
-else
-	# Oh I see you've chosen the hard way...
-	# Mount host /dev to /tmp/dev
-	mkdir -p /tmp/dev
-	mount -t devtmpfs none /tmp/dev
-	# Use mknod to manually create loop devices
-	mknod -m 0660 "/tmp/dev/loop0" b 7 0
-	# Mount the image as a loop device
-	LOOP_DEV=$(losetup --show --partscan "/tmp/dev/loop0" $IMG_FILE)
+# Find a free loop device to use.
+LOOP_DEV=$(losetup --find)
+# If the device file does not exist then use `mknod` to create it.
+if [ ! -e $LOOP_DEV ]; then
+    mknod -m 0660 $LOOP_DEV b 7 0
 fi
-# Make the LOOP_DEV env var available to other scripts
+# Mount the image as a loop device.
+LOOP_DEV=$(losetup --show --partscan $LOOP_DEV $IMG_FILE)
+# Make the LOOP_DEV environment variable available to other scripts.
 export LOOP_DEV
 
 # Wait a second or mount may fail
