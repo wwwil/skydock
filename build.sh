@@ -30,7 +30,7 @@ TAG="${TAG:-false}"
 set -o nounset
 
 echo "BUILD - Will now build Docker container"
-docker build -t lumastar/skydock:$BRANCH .
+docker build -t wwwil/skydock:$BRANCH .
 
 echo "TEST - Will now test built Docker container"
 
@@ -51,7 +51,7 @@ function test {
       -e ADD_DATA_PART=true \
       -e EXPAND=100 \
       --mount type=bind,source="$(pwd)"/test,destination=/test \
-      lumastar/skydock:$BRANCH
+      wwwil/skydock:$BRANCH
 }
 
 echo "TEST - Testing with Raspbian Stretch Lite 2018-10-11"
@@ -66,6 +66,6 @@ if [ "$TAG" != "false" ]; then
 	# Only push an image if `TAG` is not false.
 	echo "DEPLOY - Will now push Docker image to Quay.io repository as $TAG"
 	echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin quay.io
-	docker tag lumastar/skydock:$BRANCH quay.io/lumastar/skydock:$TAG
-	docker push quay.io/lumastar/skydock:$TAG
+	docker tag wwwil/skydock:$BRANCH quay.io/wwwil/skydock:$TAG
+	docker push quay.io/wwwil/skydock:$TAG
 fi

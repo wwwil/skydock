@@ -1,6 +1,6 @@
 # Skydock
 
-[![Build Status](https://travis-ci.com/lumastar/skydock.svg?branch=master)](https://travis-ci.com/lumastar/skydock)
+[![Build Status](https://travis-ci.com/wwwil/skydock.svg?branch=master)](https://travis-ci.com/wwwil/skydock)
 
 *Skydock* is a tool to customise Raspberry Pi OS images using Docker.
 
@@ -27,15 +27,15 @@ More OSes for a wider range of devices may be added in future.
 ## Usage
 
 Pull the latest Skydock Docker image from the
-[Quay.io repository](https://quay.io/repository/lumastar/skydock)
+[Quay.io repository](https://quay.io/repository/wwwil/skydock)
 with:
 
 ```
-$ docker pull quay.io/lumastar/skydock:v0.3.0
+$ docker pull quay.io/wwwil/skydock:v0.3.0
 ```
 
 A version tag should be given explicitly. Notes for each release can be found on
-the [GitHub releases](https://github.com/lumastar/skydock/releases) page.
+the [GitHub releases](https://github.com/wwwil/skydock/releases) page.
 
 Run Skydock like so:
 
@@ -45,7 +45,7 @@ $ docker run --privileged \
     -e MOUNT=/resources/customisations \
     -e SCRIPT=/customisations/customise.sh \
     --mount type=bind,source=$(pwd)/resources,destination=/resources \
-    lumastar/skydock:v0.3.0
+    wwwil/skydock:v0.3.0
 ```
 
 - `SOURCE_IMAGE` is the Raspberry Pi OS image to customise.
@@ -68,7 +68,7 @@ $ docker run --privileged \
     ...
     -e ADD_DATA_PART=true \
     ...
-    lumastar/skydock:v0.3.0
+    wwwil/skydock:v0.3.0
 ```
 
 This partition can be helpful when writing the `.img` to an SD card in macOS
@@ -86,7 +86,7 @@ $ docker run --privileged \
     ...
     -e EXPAND=200 \
     ...
-    lumastar/skydock:v0.3.0
+    wwwil/skydock:v0.3.0
 ```
 
 This can be helpful to add more space when installing large applications.
