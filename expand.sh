@@ -12,19 +12,20 @@ echo "SOURCE_IMAGE: $SOURCE_IMAGE"
 echo "EXPAND: $EXPAND"
 
 # Determine the current size of the partition.
-SIZE_BEFORE=$(parted -s "${SOURCE_IMAGE}" unit MiB print | grep -e '^ 2' \
-| xargs echo -n | cut -d" " -f 4 | tr -d MiB)
+PARTED_OUT=$(parted -s "${SOURCE_IMAGE}" unit MiB print)
+SIZE_BEFORE=$(echo -e "${PARTED_OUT}" | grep -e '^ 2' | xargs echo -n \
+| cut -d" " -f 4 | tr -d MiB)
 
 # Find the end of the root partition. This assumes there are two partitions.
-ROOT_END=$(parted -s "${SOURCE_IMAGE}" unit MiB print | grep -e '^ 2' \
-| xargs echo -n | cut -d" " -f 3 | tr -d MiB)
+ROOT_END=$(echo -e "${PARTED_OUT}" | grep -e '^ 2' | xargs echo -n \
+| cut -d" " -f 3 | tr -d MiB)
 
 ROOT_END_NEW=$(($ROOT_END + $EXPAND))
 
 parted -s "${SOURCE_IMAGE}" unit MiB print free
 
 # Expand the image slightly more than required for the new partition.
-dd bs=1M if=/dev/zero count=$(($EXPAND + 1)) >> $SOURCE_IMAGE
+qemu-img resize -f raw $SOURCE_IMAGE "+$((EXPAND + 1))M"
 
 parted -s "${SOURCE_IMAGE}" unit MiB print free
 
