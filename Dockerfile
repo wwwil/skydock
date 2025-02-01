@@ -1,4 +1,4 @@
-FROM debian:stretch
+FROM debian:bullseye
 
 RUN apt-get -y update && \
 	apt-get -y install \
@@ -12,11 +12,11 @@ RUN apt-get -y update && \
 	dosfstools \
 	xxd
 
-WORKDIR /raspbian-customiser/
+WORKDIR /skydock/
 
-COPY customise.sh /raspbian-customiser/
-COPY add-partition.sh /raspbian-customiser/
-COPY mount.sh /raspbian-customiser/
-COPY expand.sh /raspbian-customiser/
+COPY customise.sh /skydock/
+COPY add-partition.sh /skydock/
+COPY mount.sh /skydock/
+COPY expand.sh /skydock/
 
-ENTRYPOINT /raspbian-customiser/customise.sh
+ENTRYPOINT /skydock/customise.sh

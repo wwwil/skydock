@@ -40,21 +40,22 @@ if [ $EXPAND -gt "0" ]; then
     resize2fs ${LOOP_DEV}p2
 fi
 
-# Make mount point, mount image, and make the ROOTFS_DIR environment variable
-# available to other scripts.
+# Make mount point, mount image, and make the ROOTFS_DIR environment variable
+# available to other scripts.
 export ROOTFS_DIR=/mnt/rootfs
 mkdir -p $ROOTFS_DIR
-mount -o rw ${LOOP_DEV}p2 $ROOTFS_DIR
-mount -o rw ${LOOP_DEV}p1 ${ROOTFS_DIR}/boot
+mount -o rw ${LOOP_DEV}p1 ${ROOTFS_DIR}
+
+# List the contents of mount point to verify mount was successful.
+echo "CONTENTS OF /:"
+ls ${ROOTFS_DIR}
+
+mount -o rw ${LOOP_DEV}p2 ${ROOTFS_DIR}/boot || true
+echo "CONTENTS OF /boot:"
+ls ${ROOTFS_DIR}/boot
 
 # Create bind mounts for system directories.
 mount --bind /dev ${ROOTFS_DIR}/dev/
 mount --bind /sys ${ROOTFS_DIR}/sys/
 mount --bind /proc ${ROOTFS_DIR}/proc/
 mount --bind /dev/pts ${ROOTFS_DIR}/dev/pts
-
-# List the contents of mount point to verify mount was successful.
-echo "CONTENTS OF /:"
-ls ${ROOTFS_DIR}
-echo "CONTENTS OF /boot:"
-ls ${ROOTFS_DIR}/boot

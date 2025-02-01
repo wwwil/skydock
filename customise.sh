@@ -39,7 +39,7 @@ echo "ROOTFS_DIR: $ROOTFS_DIR"
 
 # Bind mount the directory specified as MOUNT. This is for scripts to run
 # inside the image and for data to be copied in.
-mkdir ${ROOTFS_DIR}/${MOUNT}
+mkdir -p ${ROOTFS_DIR}/${MOUNT}
 mount --bind $MOUNT ${ROOTFS_DIR}/${MOUNT}
 
 # Apply `ld.so.preload` fix.
@@ -52,6 +52,7 @@ cp /usr/bin/qemu-arm-static ${ROOTFS_DIR}/usr/bin/
 cp /usr/bin/qemu-aarch64-static ${ROOTFS_DIR}/usr/bin/
 
 # Enable `qemu-arm` and `qemu-aarch64` for arm64.
+update-binfmts --import /usr/bin/qemu-arm-static
 update-binfmts --enable qemu-arm
 update-binfmts --enable qemu-aarch64
 
